@@ -73,6 +73,38 @@ def get_tools():
         })
     return openai_tools
 
+def call_tool(tool_name):
+    url = mcp_url
+    payload = {
+        "jsonrpc": "2.0",
+        "id": 2,
+        "method": "tools/call",
+        "params": {"name": tool_name}
+}
+    headers = {
+        "Accept": "application/json, text/event-stream",
+        "Content-Type": "application/json"
+    }
+    r = requests.post(url, json=payload, headers=headers, stream=True)
+    r.raise_for_status()
+    for line in r.iter_lines(decode_unicode=True):
+        if line.startswith("data:"):
+            json_str = line.split(":", 1)[1].strip()
+            if json_str:
+                try:
+                    data = json.loads(json_str)
+                except json.JSONDecodeError:
+                    continue
+                result = data.get("result")
+                if result:
+                    if isinstance(result, dict) and "structuredContent" in result and "result" in result["structuredContent"]:
+                        return result["structuredContent"]["result"]
+                    return result
+                if "error" in data:
+                    raise RuntimeError(f"Tool error: {data['error']}")
+    raise RuntimeError("No valid result found in response")
+
+
 def prompt_llm(prompt,debug):
     tools = get_tools()
     tool_names = ", ".join([t["function"]["name"] for t in tools])
@@ -112,6 +144,33 @@ def prompt_llm(prompt,debug):
             print("--- Selected Tool ---")
             print(tool_name)
             print()
+
+        tool_result = call_tool(tool_name)
+        if debug:
+            print("--- Tool Result ---")
+            print(tool_result)
+            print()
+
+        # Build a new message history that includes the tool call and its result
+        follow_up_messages = [
+            {"role": "system", "content": prompt1+prompt2+prompt3 + "Your memory: " + memory + "You have access to the following tools: " + tool_names},
+            {"role": "user", "content": prompt},
+            {"role": "user", "content": "SYSTEM: Tool Used: " + str(tool_name) + ", Tool Result: " + str(tool_result)},
+        ]
+
+        final_response = client.chat.completions.create(
+            model=model,
+            messages=follow_up_messages,
+            tools=tools,
+            tool_choice="auto",
+        )
+        message = final_response.choices[0].message
+
+        if debug:
+            print("--- Full Message ---")
+            return message
+        else:
+            return message.content
     
     if debug:
         print("--- Full Message ---")
