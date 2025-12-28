@@ -39,8 +39,9 @@ def get_wttr(retries: int=1, delay: float=1.0):
         name="get_moisture_level",
         description="Get the current moisture level"
         )
-def get_moisture_level() -> int:
+def get_moisture_level() -> str:
     level = random.randint(0, 100)
+    level = str(level)+"%"
     print(f"[MCP] get_moisture_level() -> {level}%")
     return level
 
