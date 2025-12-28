@@ -28,6 +28,7 @@ def load_config():
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("-p", "--prompt", required=True, help="Prompt to send to the LLM")
+    parser.add_argument("-d","--debug", action='store_true', help="Print various debug information, such as the LLM's full reply")
     parser.add_argument("-notts","--no-tts", action='store_true', help="Disable text-to-speech")
     args = parser.parse_args()
     return args
@@ -48,7 +49,7 @@ def get_tools():
     tools = resp.json() if resp.headers.get("Content-Type", "").startswith("application/json") else resp.text
     return tools
 
-def prompt_llm(prompt):
+def prompt_llm(prompt,debug):
     tools = get_tools()
 
     apikey = os.getenv("OPENAI_API_KEY"),
@@ -57,7 +58,7 @@ def prompt_llm(prompt):
 
     client = OpenAI(
         base_url = server_url,
-        api_key=str(apikey)
+        api_key = str(apikey),
     )
     completion = client.chat.completions.create(
         model=model,
@@ -66,7 +67,10 @@ def prompt_llm(prompt):
             {"role": "user", "content": prompt},
         ]
     )
-    return completion.choices[0].message.content
+    if not debug:
+        return completion.choices[0].message.content
+    else:
+        return completion.choices[0].message
 
 def tts(reply):
     reply_sanitized = reply.replace("’", "'")
@@ -82,7 +86,7 @@ def tts(reply):
 def main():
     load_config()
     args = parse_args()
-    reply = prompt_llm(args.prompt)
+    reply = prompt_llm(args.prompt,args.debug)
     print(reply)
     if not args.no_tts:
         tts(reply)
