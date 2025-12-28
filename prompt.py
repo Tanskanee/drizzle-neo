@@ -1,6 +1,7 @@
 import requests
+from pathlib import Path
 import argparse
-import json
+import json, pathlib
 import os
 import re
 import subprocess
@@ -22,8 +23,41 @@ def load_config():
     memory_prompt = cfg['memory']['prompt']
     memory_maxlines = cfg['memory']['max_lines']
 
-    with open('./state/memory.txt', 'r') as f:
+    memory_path = Path("./state/memory.txt")
+    if not memory_path.is_file():
+        memory_path.parent.mkdir(parents=True, exist_ok=True)
+        memory_path.write_text("")
+
+    with open(memory_path, 'r') as f:
         memory = f.read()
+
+def load_context():
+    context_path = Path("./state/context.json")
+
+    if not context_path.is_file():
+        context_path.parent.mkdir(parents=True, exist_ok=True)
+        return {"version": 1, "history": []}
+
+    with open(context_path, "r+", encoding="utf-8") as f:
+        context = json.load(f)
+
+    return(context)
+
+def save_context(prompt,reply):
+    context_path = Path("./state/context.json")
+
+    context_path.parent.mkdir(parents=True, exist_ok=True)
+    if not context_path.exists():
+        context_path.write_text(json.dumps({"version": 1, "history": []}, ensure_ascii=False, indent=2))
+
+    with context_path.open("r+", encoding="utf-8") as f:
+        context = json.load(f)
+        context["history"].append({"role": "user", "content": prompt})
+        context["history"].append({"role": "assistant", "content": reply})
+        f.seek(0)
+        json.dump(context, f, ensure_ascii=False, indent=2)
+        f.truncate()
+
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -106,6 +140,7 @@ def call_tool(tool_name):
 
 
 def prompt_llm(prompt,debug):
+    # Load tool information
     tools = get_tools()
     tool_names = ", ".join([t["function"]["name"] for t in tools])
     if debug:
@@ -115,6 +150,30 @@ def prompt_llm(prompt,debug):
         print("--- Tools ---")
         print(tool_names)
         print()
+
+    # construct system prompt
+    system_prompt = (
+        prompt1
+        + prompt2
+        + prompt3
+        + memory
+        + tool_names
+    )
+
+    # load context + append user prompt to it
+    context = load_context()
+    context["history"].append({"role": "user", "content": prompt})
+
+    # create payload and append system prompt as the first value 
+    payload = []
+    payload.append({"role": "system", "content": system_prompt})
+
+    # add context to payload
+    for entry in context["history"]:
+        payload.append({
+            "role": entry["role"],
+            "content": entry["content"]
+        })
 
     apikey = os.getenv("OPENAI_API_KEY"),
     if apikey is None:
@@ -126,10 +185,7 @@ def prompt_llm(prompt,debug):
     )
     completion = client.chat.completions.create(
         model=model,
-        messages=[
-            {"role": "system", "content": prompt1+prompt2+prompt3 + "Your memory: " + memory + "You have access to the following tools: " + tool_names},
-            {"role": "user", "content": prompt},
-        ],
+        messages=payload,
         tools=tools,
         tool_choice="auto"
     )
@@ -158,9 +214,11 @@ def prompt_llm(prompt,debug):
             {"role": "user", "content": "SYSTEM: Tool Used: " + str(tool_name) + ", Tool Result: " + str(tool_result)},
         ]
 
+        payload.append({"role": "user", "content": "SYSTEM: Tool Used: " + str(tool_name) + ", Tool Result: " + str(tool_result)})
+
         final_response = client.chat.completions.create(
             model=model,
-            messages=follow_up_messages,
+            messages=payload,
             tools=tools,
             tool_choice="auto",
         )
@@ -194,6 +252,7 @@ def main():
     args = parse_args()
     reply = prompt_llm(args.prompt,args.debug)
     print(reply)
+    save_context(args.prompt,reply)
     if not args.no_tts:
         tts(reply)
 
