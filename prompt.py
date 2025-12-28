@@ -46,14 +46,46 @@ def get_tools():
         "params": {}
     }
     resp = requests.post(url, headers=headers, json=payload)
-    tools = resp.json() if resp.headers.get("Content-Type", "").startswith("application/json") else resp.text
-    return tools
+
+    if resp.headers.get("Content-Type", "").startswith("application/json"):
+        data = resp.json()
+    else:
+        data_line = None
+        for line in resp.text.splitlines():
+            line = line.strip()
+            if line.startswith("data:"):
+                data_line = line[len("data:"):].strip()
+                break
+        if data_line is None:
+            raise RuntimeError("No data field in SSE response from MCP")
+        data = json.loads(data_line)
+
+    tool_list = data.get("result", {}).get("tools", [])
+    openai_tools = []
+    for t in tool_list:
+        openai_tools.append({
+            "type": "function",
+            "function": {
+                "name": t["name"],
+                "description": t.get("description", ""),
+                "parameters": t.get("inputSchema", {"type": "object"})
+            }
+        })
+    return openai_tools
 
 def prompt_llm(prompt,debug):
     tools = get_tools()
+    tool_names = ", ".join([t["function"]["name"] for t in tools])
+    if debug:
+        print("--- Tool Definitions ---")
+        print(tools)
+        print()
+        print("--- Tools ---")
+        print(tool_names)
+        print()
 
     apikey = os.getenv("OPENAI_API_KEY"),
-    if apikey == (None,):
+    if apikey is None:
         apikey = ""
 
     client = OpenAI(
@@ -63,14 +95,29 @@ def prompt_llm(prompt,debug):
     completion = client.chat.completions.create(
         model=model,
         messages=[
-            {"role": "system", "content": prompt1+prompt2+prompt3 + "Your memory: " + memory + "You have access to the following tools: " + tools},
+            {"role": "system", "content": prompt1+prompt2+prompt3 + "Your memory: " + memory + "You have access to the following tools: " + tool_names},
             {"role": "user", "content": prompt},
-        ]
+        ],
+        tools=tools,
+        tool_choice="auto"
     )
-    if not debug:
-        return completion.choices[0].message.content
+
+    message = completion.choices[0].message
+
+    # Check if the model decided to call a tool
+    # These two lines below are full of LSP errors but work fine, just ignore
+    if getattr(message, "tool_calls", None) and len(message.tool_calls) > 0:
+        tool_name = message.tool_calls[0].function.name
+        if debug:
+            print("--- Selected Tool ---")
+            print(tool_name)
+            print()
+    
+    if debug:
+        print("--- Full Message ---")
+        return message
     else:
-        return completion.choices[0].message
+        return message.content
 
 def tts(reply):
     reply_sanitized = reply.replace("’", "'")
