@@ -1,3 +1,4 @@
+from pydoc import describe
 from fastmcp import FastMCP
 import random
 import subprocess, time
@@ -34,19 +35,28 @@ def get_wttr(retries: int=1, delay: float=1.0):
 
 # ======================================================================
 
-@mcp.tool()
+@mcp.tool(
+        name="get_moisture_level",
+        description="Get the current moisture level"
+        )
 def get_moisture_level() -> int:
     level = random.randint(0, 100)
     print(f"[MCP] get_moisture_level() -> {level}%")
     return level
 
-@mcp.tool()
+@mcp.tool(
+        name="get_date_and_time",
+        description="Get the current date and time"
+)
 def get_date_and_time() -> str:
     date = f"{datetime.now().strftime('%A')} {(_ordinal(datetime.now().day))} {datetime.now().strftime('%B %Y %H:%M')}"
     print(f"[MCP] get_date_and_time() -> {date}")
     return date
 
-@mcp.tool()
+@mcp.tool(
+        name="get_weather",
+        description="Get weather in current location"
+)
 def get_weather() -> str:
     weather = get_wttr()
     if weather is None:

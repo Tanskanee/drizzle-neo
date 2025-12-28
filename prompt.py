@@ -1,3 +1,4 @@
+import requests
 import argparse
 import json
 import os
@@ -31,7 +32,25 @@ def parse_args():
     args = parser.parse_args()
     return args
 
+def get_tools():
+    url = mcp_url
+    headers = {
+        "Content-Type": "application/json",
+        "Accept": "application/json, text/event-stream",
+    }
+    payload = {
+        "jsonrpc": "2.0",
+        "id": 4,
+        "method": "tools/list",
+        "params": {}
+    }
+    resp = requests.post(url, headers=headers, json=payload)
+    tools = resp.json() if resp.headers.get("Content-Type", "").startswith("application/json") else resp.text
+    return tools
+
 def prompt_llm(prompt):
+    tools = get_tools()
+
     apikey = os.getenv("OPENAI_API_KEY"),
     if apikey == (None,):
         apikey = ""
@@ -43,7 +62,7 @@ def prompt_llm(prompt):
     completion = client.chat.completions.create(
         model=model,
         messages=[
-            {"role": "system", "content": prompt1+prompt2+prompt3 + "Your memory: " + memory},
+            {"role": "system", "content": prompt1+prompt2+prompt3 + "Your memory: " + memory + "You have access to the following tools: " + tools},
             {"role": "user", "content": prompt},
         ]
     )
