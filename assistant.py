@@ -18,7 +18,7 @@ def on_segment(text: str) -> None:
     print(text)
     env = os.environ.copy()
     env["OPENAI_API_KEY"] = apikey
-    subprocess.run(['python3', 'prompt.py', '-p', text, '-notts', '-ns'], env=env)  
+    subprocess.run(['python3', 'prompt.py', '-p', text], env=env)  
     print("--- Listening... ---")
 
 # models are saved to ~/.local/share/pywhispercpp/models/

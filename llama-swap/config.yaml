@@ -26,6 +26,8 @@ models:
       --top-p 1
       # Context length. Lower if you're having issues getting the model to fit into VRAM
       -c 65536
+      # Example of securing a model with an API key
+      #--api-key "my-api-key"
       --port ${PORT}
   "GPT-OSS-20B-High-MXFP4":
     ttl: 7200
