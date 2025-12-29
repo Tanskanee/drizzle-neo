@@ -24,8 +24,8 @@ def on_segment(text: str) -> None:
 # models are saved to ~/.local/share/pywhispercpp/models/
 # pick optimal model (above for list of models) based on your CPU's processing time
 # good models based on CPUs I've tested:
-# i7-3632QM: base.en
-# i7-8650U:  small
+# i7-3632QM: base.en    (142MB)
+# i7-8650U:  small      (466MB)
 assistant = Assistant(
         model = "small",
         silence_threshold = 64,         # Default: 8
