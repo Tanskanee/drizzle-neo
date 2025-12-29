@@ -10,7 +10,7 @@ from openai import OpenAI
 def load_config():
     with open('config.json') as f:
         cfg = json.load(f)
-    global server_url, mcp_url, model, prompt1, prompt2, prompt3, memory_model, memory_prompt, memory_maxlines, memory
+    global server_url, mcp_url, model, prompt1, prompt2, prompt3, memory_model, memory_prompt, memory_maxmsgs, memory
     server_url = cfg['server']['url']
     mcp_url = cfg['mcp']['url']
 
@@ -21,7 +21,7 @@ def load_config():
 
     memory_model = cfg['memory']['model']
     memory_prompt = cfg['memory']['prompt']
-    memory_maxlines = cfg['memory']['max_lines']
+    memory_maxmsgs = cfg['memory']['max_messages']
 
     memory_path = Path("./state/memory.txt")
     if not memory_path.is_file():
@@ -138,7 +138,6 @@ def call_tool(tool_name):
                     raise RuntimeError(f"Tool error: {data['error']}")
     raise RuntimeError("No valid result found in response")
 
-
 def prompt_llm(prompt,debug):
     # Load tool information
     tools = get_tools()
@@ -236,6 +235,26 @@ def prompt_llm(prompt,debug):
     else:
         return message.content
 
+def update_memory():
+    context = load_context()
+
+    n_lines = memory_maxmsgs/2
+
+    # Remove the first n_lines entries from history (keep only newer entries)
+    if len(context.get("history", [])) > n_lines:
+        context["history"] = context["history"][n_lines:]
+    
+    # Persist the updated context back to the JSON file
+    context_path = Path("./state/context.json")
+    context_path.parent.mkdir(parents=True, exist_ok=True)
+    with context_path.open("r+", encoding="utf-8") as f:
+        current = json.load(f)
+        current["history"] = context["history"]
+        #print(current)
+        #f.seek(0)
+        #json.dump(current, f, ensure_ascii=False, indent=2)
+        #f.truncate()
+
 def tts(reply):
     reply_sanitized = reply.replace("’", "'")
     reply_sanitized = reply_sanitized.replace("*", "")
@@ -250,6 +269,7 @@ def tts(reply):
 def main():
     load_config()
     args = parse_args()
+    update_memory()
     reply = prompt_llm(args.prompt,args.debug)
     print(reply)
     save_context(args.prompt,reply)
