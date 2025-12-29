@@ -3,8 +3,14 @@
 A version of Drizzle AI that remembers past conversations and has long-term
 memory.
 
-WARNING! This project has **only** been tested on Linux. It may or may not work
+WARNING! This project has only been tested on Linux. It may or may not work
 inside WSL2.
+
+WARNING! This projecr has been only tested using a locally hosted llama-swap
+instance inside my LAN, not protected by an API key. This project may work with
+any other OpenAI-compatible endpoint (ChatGPT, Gemini, etc.), but it is not
+quaranteed. Instructions for setting up a llama-swap server are included inside
+`./llama-swap`.
 
 ## Features
 

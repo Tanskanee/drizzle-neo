@@ -1,0 +1,28 @@
+services:
+  llama-swap:
+    # Vulkan provides wide compatibility across different GPUs. You may use the Cuda or ROCm image instead depending on your GPU
+    # Container tags are in https://github.com/mostlygeek/llama-swap/pkgs/container/llama-swap
+    image: ghcr.io/mostlygeek/llama-swap:v174-vulkan-b7205
+    container_name: llama-swap
+
+    volumes:
+      # THESE ARE PLACEHOLDER VALUES WHICH DON'T WORK! CHANGE THESE TO WHERE YOUR STUFF IS ACTUALLY LOCATED!
+      # The :z at the end is required in distros that use SELinux. Remove it if it cause problems
+      - /home/jesse/drizzle-neo/llama-swap/models:/models:z
+      - /home/jesse/drizzle-neo/llama-swap/config.yaml:/app/config.yaml:z
+
+    # Allow access to GPU
+    # Only tested on an AMD GPU
+    # Comment out if this causes problems
+    #
+    # If running in Podman, you may need to run the command below to allow access to devices
+    # sudo setsebool -P container_use_devices=true
+    # https://docs.podman.io/en/latest/markdown/podman-run.1.html
+    devices:
+      - /dev/kfd
+      - /dev/dri
+
+    # The port of the interface and the API endpoint
+    # e.g. http://127.0.0.1:9292
+    ports:
+      - "9292:8080"

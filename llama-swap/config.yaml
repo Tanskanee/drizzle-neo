@@ -1,0 +1,108 @@
+# Example config: https://github.com/mostlygeek/llama-swap/wiki/Configuration
+# See: https://github.com/ggml-org/llama.cpp/issues/17033 to force parallel processing to be off (-np 1 & -kvu) or if you're having performance issues
+
+healthCheckTimeout: 900
+#sendLoadingState: true
+
+models:
+
+  # GPT-OSS GGUFs: https://huggingface.co/bartowski/openai_gpt-oss-20b-GGUF
+  # Pick MXFP4 for optimal size/performance ratio
+  # Recommended settings: https://unsloth.ai/docs/models/gpt-oss-how-to-run-and-fine-tune
+  # Recommended RAM/VRAM: 16GB
+  "GPT-OSS-20B-Med-MXFP4":
+    ttl: 7200
+    cmd: |
+      /app/llama-server
+      -m /models/GPT-OSS/openai_gpt-oss-20b-MXFP4.gguf
+      -fa on
+      -ngl 99     # Number of layers offloaded to a GPU. Set to 0 to run on CPU
+      #-ncmoe 10   # Uncomment and adjust this if your GPU doesn't have 16GB VRAM. The higher the value, the more MoE experts are offloaded to CPU memory, and more VRAM is freed
+      --jinja
+      --temp 1
+      --top-k 0
+      --top-p 1
+      -c 65536    # Context length. Lower if you're having issues getting the model to fit into VRAM
+      --port ${PORT}
+  "GPT-OSS-20B-High-MXFP4":
+    ttl: 7200
+    cmd: |
+      /app/llama-server
+      -m /models/GPT-OSS/openai_gpt-oss-20b-MXFP4.gguf
+      # Set reasoning effort to high (medium by default)
+      --chat-template-kwargs '{"reasoning_effort": "high"}'
+      -fa on
+      -ngl 99
+      #-ncmoe 10
+      --jinja
+      --temp 1
+      --top-k 0
+      --top-p 1
+      -c 65536
+      --port ${PORT}
+
+  # Qwen3-VL-4B-Instruct GGUFs: https://huggingface.co/unsloth/Qwen3-VL-4B-Instruct-GGUF
+  # Pick Q4_K_XL for optimal size/performance ratio
+  # Recommended settings: https://unsloth.ai/docs/models/qwen3-vl-how-to-run-and-fine-tune
+  # Recommended RAM/VRAM: 4GB - 8GB (depends on GGUF size)
+  "Qwen3-VL-4B-Instruct-Q4_K_XL":
+    ttl: 7200
+    cmd: |
+      /app/llama-server
+      -m /models/Qwen3/Qwen3-VL-4B-Instruct-UD-Q4_K_XL.gguf
+      -fa on
+      -ngl 0
+      --cpu-strict 1
+      -np 1
+      -kvu
+      --jinja
+      --temp 0.7
+      --top-k 20
+      --top-p 0.8
+      --min-p 0.0
+      --presence-penalty 1.5
+      -c 16384
+      --port ${PORT}
+
+  # Qwen3-VL-4B-Thinking GGUFs: https://huggingface.co/unsloth/Qwen3-VL-4B-Thinking-GGUF
+  # Pick Q4_K_XL for optimal size/performance ratio
+  # Recommended settings: https://unsloth.ai/docs/models/qwen3-vl-how-to-run-and-fine-tune
+  # Recommended RAM/VRAM: 4GB - 8GB (depends on GGUF size)
+  "Qwen3-VL-4B-Thinking-Q4_K_XL":
+    ttl: 7200
+    cmd: |
+      /app/llama-server
+      -m /models/Qwen3/Qwen3-VL-4B-Thinking-UD-Q4_K_XL.gguf
+      -fa on
+      -ngl 0
+      --cpu-strict 1
+      -np 1
+      -kvu
+      --jinja
+      --temp 1.0
+      --top-k 20
+      --top-p 0.95
+      --min-p 0.0
+      --presence-penalty 0.0
+      -c 16384
+      --port ${PORT}
+
+  # Granite-4.0-h-Tiny GGUFs: https://huggingface.co/unsloth/granite-4.0-h-tiny-GGUF
+  # Pick Q8_0 for optimal size/performance ratio
+  # Recommended settings: https://unsloth.ai/docs/models/tutorials-how-to-fine-tune-and-run-llms/ibm-granite-4.0
+  # Recommended RAM/VRAM: 8GB
+  "Granite-4.0-h-Tiny-7B-Q8_0":
+    ttl: 7200
+    cmd: |
+      /app/llama-server
+      -m /models/Granite4/granite-4.0-h-tiny-Q8_0.gguf
+      -fa on
+      -ngl 0
+      --cpu-strict 1
+      -np 1
+      -kvu
+      --temp 0.0
+      --top-k 0.0
+      --top-p 1.0
+      -c 16384
+      --port ${PORT}
