@@ -26,18 +26,20 @@ configuration options for models are detailed in `config.yaml`.
 reasoning, highest quality), Qwen3 (thinking and instruct versions, medium
 quality) and Granite-4.0-h-Tiny (fastest, low quality).
 
-GPT-OSS-20B is designed to run on a 16GB GPU, but since it is a MoE
+GPT-OSS-20B is designed to run on a 16GB VRAM GPU, but since it is a MoE
 (mixture-of-experts) model, it may run at decent speeds on even 8GB GPUs by
 adjusting the `-ncmoe` configuration option. If you want to run GPT-OSS-20B on
-your CPU, set `-ngl` to 0.
+your CPU, set `-ngl` to 0. Running GPT-OSS-20B on CPU requires 16GB RAM at
+minimum.
 
-Qwen3 (thinking and instruct) are designed to run on CPU, thus `-ngl` is set to
-0 by default. I suggest starting with the thinking version (higher quality) and
-moving to the instruct version if thinking is too slow (Qwen3 is known to
-overthink at times).
+Qwen3-4B (thinking and instruct) is designed to run on low-VRAM GPUs. I suggest
+starting with the thinking version (higher quality) and moving to the instruct
+version if thinking is too slow (Qwen3 is known to overthink at times). Qwen3-4B
+is slower when running on CPU than GPT-OSS-20B and much worse quality, so it
+should **only** be used if you have less than 16GB RAM and no dedicated GPU.
 
-Granite 4.0 Tiny is also designed to run on a CPU. It is the fastest model of
-the three, but also the lowest quality.
+Granite 4.0 Tiny is designed to run on a CPU, thus its `-ngl` is set to 0 by
+default. It is the fastest model of the three, but also the lowest quality.
 
 ## Troubleshooting
 
