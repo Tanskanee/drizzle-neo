@@ -147,7 +147,7 @@ def assemble_payload(prompt,debug):
         print("--- Tool Definitions ---")
         print(tools)
         print()
-        print("--- Tools ---")
+        print("--- Available Tools ---")
         print(tool_names)
         print()
 
@@ -196,6 +196,9 @@ def prompt_llm(prompt,debug):
     )
 
     message = completion.choices[0].message
+    if debug:
+        print("--- Full Message Before Tool Call Check ---")
+        print(message)
 
     # Check if the model decided to call a tool
     # These two lines below are full of LSP errors but work fine, just ignore
