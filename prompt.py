@@ -1,10 +1,11 @@
 import requests
 from pathlib import Path
 import argparse
-import json, pathlib
+import json
 import os
 import re
 import subprocess
+from sentence_transformers import SentenceTransformer
 from openai import OpenAI
 
 # load configuration options and make them global variables
@@ -143,6 +144,27 @@ def call_tool(tool_name):
                     raise RuntimeError(f"Tool error: {data['error']}")
     raise RuntimeError("No valid result found in response")
 
+def rag(prompt):
+    # Load JSON and extract the message history
+    data = json.load(open("./state/context-archive.json", encoding='utf-8'))
+    history = data.get('history', [])
+
+    # Embed the query and all message contents
+    model = SentenceTransformer('all-MiniLM-L6-v2')
+    contents = [msg['content'] for msg in history]
+    q_emb   = model.encode([prompt])
+    c_emb   = model.encode(contents)
+
+    # Find the best‑matching message(s)
+    scores  = (q_emb @ c_emb.T).flatten()
+    best_idx = scores.argmax()
+
+    # Return matches in simplified format
+    retrieved = "\n".join(f"{msg['role']}: {msg['content']}" for msg in history[:best_idx + 1])
+    #print(retrieved)
+
+    return retrieved
+
 def assemble_payload(prompt,debug):
     # Load tool information
     tools = get_tools()
@@ -155,12 +177,26 @@ def assemble_payload(prompt,debug):
         print(tool_names)
         print()
 
+    rag_result = rag(prompt)
+
     # construct system prompt
     system_prompt = (
         prompt1
+        + "\n\n"
         + prompt2
+        + "\n\n"
         + prompt3
+        + "\n\n"
+        + "Your memory:"
+        + "\n"
         + memory
+        + "\n\n"
+        + "Context based on archived messages:"
+        + "\n"
+        + rag_result
+        + "\n\n"
+        + "You have access to the following tools:"
+        + "\n"
         + tool_names
     )
 
@@ -179,10 +215,10 @@ def assemble_payload(prompt,debug):
             "content": entry["content"]
         })
 
-    return (payload,tools,tool_names)
+    return (payload,tools)
 
 def prompt_llm(prompt,debug):
-    payload,tools,tool_names = assemble_payload(prompt,debug)
+    payload,tools = assemble_payload(prompt,debug)
 
     apikey = os.getenv("OPENAI_API_KEY")
     if apikey is None:
@@ -219,13 +255,7 @@ def prompt_llm(prompt,debug):
             print(tool_result)
             print()
 
-        # Build a new message history that includes the tool call and its result
-        follow_up_messages = [
-            {"role": "system", "content": prompt1+prompt2+prompt3 + "Your memory: " + memory + "You have access to the following tools: " + tool_names},
-            {"role": "user", "content": prompt},
-            {"role": "user", "content": "SYSTEM: Tool Used: " + str(tool_name) + ", Tool Result: " + str(tool_result)},
-        ]
-
+        # Build a new payload that includes the tool call and its result
         payload.append({"role": "user", "content": "SYSTEM: Tool Used: " + str(tool_name) + ", Tool Result: " + str(tool_result)})
 
         final_response = client.chat.completions.create(
@@ -277,10 +307,30 @@ def update_memory_if_required():
             ]
         )
 
+        # Write newly generated memory to memory.txt
         message = completion.choices[0].message
         #print(message.content)
         Path("./state/memory.txt").write_text(str(message.content))
 
+        # archive deleted messages
+        to_remove = context["history"][:-n_lines]
+        hist_path = Path("./state/context-archive.json")
+        hist_path.parent.mkdir(parents=True, exist_ok=True)
+        if hist_path.is_file():
+            with hist_path.open("r+", encoding="utf-8") as f:
+                try:
+                    existing = json.load(f)
+                except json.JSONDecodeError:
+                    existing = {"history": []}
+                existing["history"].extend(to_remove)
+                f.seek(0)
+                json.dump(existing, f, ensure_ascii=False, indent=2)
+                f.truncate()
+        else:
+            with hist_path.open("w", encoding="utf-8") as f:
+                json.dump({"history": to_remove}, f, ensure_ascii=False, indent=2)
+
+        # Trim context.txt
         context["history"] = context["history"][-n_lines:]
         context_path = Path("./state/context.json")
         context_path.parent.mkdir(parents=True, exist_ok=True)
