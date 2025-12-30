@@ -8,13 +8,18 @@ instance in a podman/docker environment.
 - Download your desired models and place them into their respective directories
   in the `models` directory
   - see: comments in `config.yaml`
-- Edit `compose.yml` and replace the placeholder volume paths with your own
+- Edit `compose.yml` and replace the placeholder volume paths with your own.
+  Additionally comment out the `device:` section if it is giving you problems
+  later
 - Edit `config.json` and replace the model names there with the models you want
   to use
   - see: `config.yaml` for appropriate model names
 - Make sure you are inside the `llama-swap` directory
 - Run the following command: `$ podman compose up` 
   - Replace `podman` with `docker` depending on which one you use
+  - Exit with CTRL+C
+  - Start in background: `$ podman compose up -d`
+    - Stop when started in background: `$ podman compose down`
 - Set server.url in `config.json` to "http://127.0.0.1:9292/v1"
 
 ## Preconfigured Models

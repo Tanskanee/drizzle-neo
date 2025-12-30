@@ -7,16 +7,16 @@ WARNING! This project has only been tested on Linux. It may or may not work
 inside WSL2.
 
 WARNING! This project has been only tested using a locally hosted llama-swap
-instance inside my LAN, not protected by an API key. This project may work with
-any other OpenAI-compatible endpoint (ChatGPT, Gemini, etc.), but it is not
-guaranteed. Instructions for setting up a llama-swap server are included inside
-`./llama-swap`.
+instance inside my LAN. This project may work with any other OpenAI-compatible
+endpoint (ChatGPT, Gemini, etc.), but it is not guaranteed. Instructions for
+setting up a llama-swap server are included inside `./llama-swap`.
 
 ## Features
 
 - Conversation history (stored in context.txt)
-- Automatic pruning of conversation history
-- Long-term memory generation (stored in memory.txt)
+- Automatic pruning and archival of conversation history
+- Long-term memory via memory generation (stored in memory.txt) and RAG (from
+  archived conversations at context-archive.json)
 - Tool use via the MCP protocol
 - Text-to-speech (hosted externally)
 - Speech-to-text using pywhispercpp
