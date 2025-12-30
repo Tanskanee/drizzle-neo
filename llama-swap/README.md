@@ -1,13 +1,13 @@
 # Drizzle-NEO llama-swap Configuration
 
 This directory contains instructions on setting up a locally hosted llama-swap
-instance in a podman/docker environment.
+instance in a podman/docker container.
 
 ## Usage
 
 - Download your desired models and place them into their respective directories
   in the `models` directory
-  - see: comments in `config.yaml`
+  - see: comments in `config.yaml` for URLs
 - Edit `compose.yml` and replace the placeholder volume paths with your own
 - (Optional) Uncomment the `devices:` section in `compose.yml` to allow access
   to a GPU

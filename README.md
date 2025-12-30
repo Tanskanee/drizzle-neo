@@ -1,26 +1,51 @@
 # Drizzle-NEO
 
-A version of Drizzle AI that remembers past conversations and has long-term
-memory.
+## Drizzle AI - Uusi ääni kasvista! 🌿💬
 
-WARNING! This project has only been tested on Linux. It may or may not work
-inside WSL2.
+**Drizzle AI:n uudella teknologialla voit kuulla kasvien tarinoita.** 🌱
 
-WARNING! This project has been only tested using a locally hosted llama-swap
-instance inside my LAN. This project should work with any other
-OpenAI-compatible endpoint (ChatGPT, Gemini, etc.), but that is not guaranteed.
-Instructions and configurations for setting up a llama-swap server are included
-inside `./llama-swap`.
+Vuodesta toiseen, teemme työtasi, meidän kasvavat! Nyt voit kuulla nekin!
+AI-teknologia yhdistää sinut ja kasvien maailmaan, luodaksesi uuden luovaa
+yhteyttä luonnon kanssa. Drizzle AI:n avulla saat tietoa kasvin tarinoista,
+jotka kertovat häiriöistä tai tarvitsemuksesta. 
+
+**Mitä tämä tarkoittaa?**
+
+* Tieto riippuu kasvien väriin ja kasvustoon.
+* Kuulet kasvien tarinoita, jotka kertovat häiriöistä tai tarvitsemuksesta. 
+* Tulet luomaan uusia ja vastuullisia ympäristön tasapainotuksia.  
+
+**Oletko valmis luomaan uuden maailman kasviin?** 
+
+_Toivoisitteeko kokeilemaan Drizzle AI:tä?_
+
+## Introduction
+
+Drizzle NEO is a version of Drizzle AI that remembers past conversations, is
+able to call tools, has long-term memory, etc. (more features listed below) It
+can be seen as a continuation to my previous IoT project, which was a fairly
+rudimentary system that generated a single message based on a plant's moisure
+level, with no memory or anything else fancy.
+
+## Warnings!
+
+This project has only been tested on Linux. It may or may not work inside WSL2.
+
+Additionally, it has only been tested using a locally hosted llama-swap instance
+inside my LAN. This project should work with any OpenAI-compatible endpoint
+(ChatGPT, Gemini, etc.), but that is not guaranteed. Instructions and
+configurations for setting up a llama-swap server are included inside
+`./llama-swap`.
 
 ## Features
 
-- Conversation (short-term) history (stored in context.txt)
+- Conversation (short-term memory) history (stored in context.txt)
 - Automatic pruning and archival of conversation history
 - Long-term memory via memory generation (stored in memory.txt) and RAG (from
   archived conversations in `context-archive.json`)
 - Tool use via the MCP protocol
 - Text-to-speech (hosted externally)
-- Speech-to-text using pywhispercpp
+- Speech-to-text hands-free conversations using pywhispercpp
 
 ## Installation
 
@@ -42,7 +67,7 @@ inside `./llama-swap`.
 - Prompt model to confirm it is working: `$ python prompt.py -p "How are you?"`
   - Run `$ python prompt.py -h` for available options
 - Run assistant.py for hands-free conversations: `$ python assistant.py`
-  - Downloading the speech-to-text may take a while
+  - Downloading the speech-to-text model may take a while
   - You should adjust the speech-to-text model based on your CPU, see comments
     in `assistant.py`
 - If your API requires an API key, prepend it to the commands, for example:
@@ -51,7 +76,7 @@ inside `./llama-swap`.
 
 For instructions on setting up your own llama-swap server, refer to `./llama-swap/README.md`.
 
-## Configuration
+## Configuration Options
 
 Configuration options are stored in config.json.
 
@@ -68,7 +93,7 @@ The MCP server's URL
 #### model
 
 The conversation model. Tested with GPT-OSS, Qwen3 and Granite 4.0. The model
-must support tool calls.
+must support tool calls
 
 #### prompt1
 

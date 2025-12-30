@@ -1,12 +1,20 @@
 requests
 simpleaudio
+# Pywhispercpp will compile from source and most likely fails and complains about missing build dependencies.
+# Just throw the error to an LLM and it will tell you what to install ¯\_(ツ)_/¯
 git+https://github.com/absadiki/pywhispercpp@cfff92980c43e9fdfcf9fa61f5d51a82c2cbe0fe
 sounddevice
 webrtcvad
 setuptools
 openai
+# Deprecation warning with no migration instructions? Just lock the version!
 setuptools==66.1.1
+# A new version of numpy was released in the middle of me developing this project, causing pywhispercpp to break...
+# Thanks, NumPy!!
 numpy==2.3.4
 fastmcp
+# You *will* have to install requirement.txt with the following command:
+# `$ pip install -r requirements.txt --extra-index-url https://download.pytorch.org/whl/cpu`
+# Otherwise multiple gigabytes of CUDAslop is installed on your machine
 sentence_transformers
 torch
