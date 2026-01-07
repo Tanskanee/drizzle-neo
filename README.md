@@ -55,7 +55,8 @@ configurations for setting up a llama-swap server are included inside
 - Install dependencies
   - `$ pip install -r requirements.txt --extra-index-url https://download.pytorch.org/whl/cpu`
   - WARNING! May require Python3 development headers! Install the appropriate
-    package depending on your distribution (`python3-dev`, `python3-devel`, etc.).
+    package depending on your distribution (`python3-dev`, `python3-devel`,
+    etc.). A C++ compiler (`g++`) may also be required.
 
 ## Usage
 
