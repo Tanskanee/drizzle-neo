@@ -64,7 +64,7 @@ configurations for setting up a llama-swap server are included inside
   - OpenAI-compatible API URL
   - Model for conversations and memory generation
   - MCP server URL (leave as default if running locally)
-- Start the MCP server: `$ python server.py`
+- Start the MCP server: `$ python mcp-server.py`
 - Prompt model to confirm it is working: `$ python prompt.py -p "How are you?"`
   - Run `$ python prompt.py -h` for available options
 - Run assistant.py for hands-free conversations: `$ python assistant.py`
