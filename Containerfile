@@ -11,8 +11,8 @@ VOLUME /app
 COPY requirements.lock .
 RUN pip install --no-cache-dir -r requirements.lock
 
-# Copy application code
-COPY . .
+# Copy required application code
+COPY app.py assistant.py audio.py config.json mcp-server.py prompt.py ./
 
 # Expose the Flask server port (5000)
 EXPOSE 5000
