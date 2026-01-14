@@ -1,6 +1,6 @@
 services:
   drizzle:
-    image: localhost/drizzle-neo
+    image: drizzle-neo
     container_name: drizzle-neo
     ports:
       - "5000:5000"

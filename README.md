@@ -37,6 +37,9 @@ inside my LAN. This project should work with any OpenAI-compatible endpoint
 configurations for setting up a llama-swap server are included inside
 `./llama-swap`.
 
+This project does not work with Ollama due to the `tool_choice` request field
+being unsupported (see: [https://docs.ollama.com/api/openai-compatibility]).
+
 ## Features
 
 - Conversation (short-term memory) history (stored in context.txt)
@@ -65,9 +68,11 @@ configurations for setting up a llama-swap server are included inside
 If using Docker, replace `podman` with `docker`.
 
 - Build the container
-  - `$ podman build -f Containerfile -t drizzle-neo`
+  - `$ podman build -f Containerfile -t drizzle-neo .`
 - Run the example compose.yml
   - `$ podman compose up`
+- If connecting to a locally hosted LLM server on the same machine, set
+  server.url in `config.json` to `http://host.docker.internal:9292/v1`
 - Test functionality
 
 ```shell
