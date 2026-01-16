@@ -114,6 +114,9 @@ curl -X POST http://127.0.0.1:5000/run \
 
 ## Usage
 
+If you installed Drizzle NEO in a container, these steps are not needed, just
+start the container. See Installation->Container section above.
+
 - Set your desired parameters in `config.json`
   - OpenAI-compatible API URL
   - Model for conversations and memory generation
