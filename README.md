@@ -1,4 +1,4 @@
-# Drizzle-NEO
+# Drizzle NEO
 
 ## Drizzle AI - Uusi ääni kasvista! 🌿💬
 
@@ -79,6 +79,37 @@ If using Docker, replace `podman` with `docker`.
 curl -X POST http://127.0.0.1:5000/run \
    -H "Content-Type: application/json" \
    -d '{"prompt":"What\'s the weather like?","args":["-notts"]}'
+```
+
+### Container (full)
+
+This container is for development purposes only, intended for those who don't
+want to set up their own LLM server. It should require the minimal amount of
+configuration to get started.
+
+This image comes with a built-in llama.cpp server that launches a model located
+in `./models/model.gguf` with default parameters. It runs purely on the CPU and
+lacks GPU acceleration.
+
+- Build the base `drizzle-neo` container using the instructions above.
+- Build the "full" container
+  - `$ podman build -f Containerfile.full -t drizzle-neo-full .`
+- Download your desired model and save it as `./models/model.gguf`
+  - If you don't know what model to pick, download
+    `granite-4.0-h-tiny-UD-Q4_K_XL.gguf` from
+    [https://huggingface.co/unsloth/granite-4.0-h-tiny-GGUF/tree/main]
+  - Make sure to rename the file to `model.gguf`!
+- Set server.url in `config.json` to `http://127.0.0.1:5050/v1`
+- Uncomment the drizzle-neo-full example from `compose.yml` and comment out the
+  drizzle-neo example
+- Run the example compose.yml
+  - `$ podman compose up`
+- Test functionality
+
+```shell
+curl -X POST http://127.0.0.1:5000/run \
+   -H "Content-Type: application/json" \
+   -d '{"prompt":"Who are you?","args":["-notts"]}'
 ```
 
 ## Usage

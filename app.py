@@ -15,8 +15,6 @@ _/_/_/    _/    _/  _/_/_/  _/_/_/_/_/  _/_/_/_/_/  _/_/_/_/  _/_/_/_/
   _/  _/  _/  _/_/_/    _/    _/    
  _/    _/_/  _/        _/    _/     
 _/      _/  _/_/_/_/    _/_/        
-
-           --= ONLINE =--
 """)
 
 # Example usage with curl:
@@ -40,7 +38,7 @@ def run_prompt():
         cwd=os.path.dirname(__file__),  # ensures prompt.py is found
         capture_output=True,
         text=True,
-        timeout=180
+        timeout=300
     )
 
     return app.response_class(

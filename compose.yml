@@ -8,3 +8,15 @@ services:
       - ./state:/app/state:z
       - ./config.json:/app/config.json:z
     restart: unless-stopped
+
+#services:
+#  drizzle:
+#    image: drizzle-neo-full
+#    container_name: drizzle-neo-full
+#    ports:
+#      - "5000:5000"
+#    volumes:
+#      - ./state:/app/state:z
+#      - ./config.json:/app/config.json:z
+#      - ./models:/app/models:z
+#    restart: unless-stopped

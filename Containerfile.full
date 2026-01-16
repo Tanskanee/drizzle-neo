@@ -1,0 +1,17 @@
+FROM drizzle-neo:latest
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    cmake wget libopenblas-dev pkg-config
+
+WORKDIR /app
+
+VOLUME /app/state
+VOLUME /app/models
+VOLUME /app
+
+RUN git clone https://github.com/ggml-org/llama.cpp && \
+    cd llama.cpp && git checkout b7684 && \
+    cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DGGML_NATIVE=ON -DLLAMA_BUILD_TESTS=OFF -DGGML_BLAS=ON -DGGML_BLAS_VENDOR=OpenBLAS -DLLAMA_CURL=OFF && \
+    cmake --build build --config Release -j$(nproc)
+
+CMD ["sh","-c","/app/llama.cpp/build/bin/llama-server -m /app/models/model.gguf -kvu -np 1 --cpu-strict 1 --numa numactl -c 8096 -ub 1024 --port 5050 & python mcp-server.py & python app.py; wait"]

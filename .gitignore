@@ -1,4 +1,5 @@
 state
+models/*.gguf
 llama-swap/models
 *.bak
 venv
