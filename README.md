@@ -217,3 +217,23 @@ service is down quite often, so expect curl errors
 
 Use RAG to recall information from past conversations. All conversations are
 permanently stored in `context-archive.json`
+
+## API Endpoints
+
+### GET /config
+
+Retrieve the current configuration.
+
+```shell
+curl http://127.0.0.1:5000/config
+```
+
+### PUT /config
+
+Update the configuration.
+
+```shell
+curl -X PUT http://127.0.0.1:5000/config \
+  -H "Content-Type: application/json" \
+  -d '{"server": {"url": "http://new-url:9292/v1"}}'
+```
