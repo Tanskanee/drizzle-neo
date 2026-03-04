@@ -126,5 +126,31 @@ def update_config():
         return jsonify({"error": f"Failed to update config: {str(e)}"}), 500
 
 
+@app.route("/state", methods=["GET"])
+def list_state_files():
+    state_dir = os.path.join(os.path.dirname(__file__), "state")
+    try:
+        files = [f for f in os.listdir(state_dir) if os.path.isfile(os.path.join(state_dir, f))]
+        return jsonify({"files": files})
+    except Exception as e:
+        return jsonify({"error": f"Failed to list files: {str(e)}"}), 500
+
+
+@app.route("/state/<filename>", methods=["GET"])
+def get_state_file(filename):
+    state_dir = os.path.join(os.path.dirname(__file__), "state")
+    file_path = os.path.join(state_dir, filename)
+
+    if not os.path.exists(file_path) or not os.path.isfile(file_path):
+        return jsonify({"error": f"File '{filename}' not found in state directory"}), 404
+
+    try:
+        with open(file_path, "r") as f:
+            content = f.read()
+        return jsonify({"filename": filename, "content": content})
+    except Exception as e:
+        return jsonify({"error": f"Failed to read file: {str(e)}"}), 500
+
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=False)

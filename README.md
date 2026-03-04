@@ -237,3 +237,34 @@ curl -X PUT http://127.0.0.1:5000/config \
   -H "Content-Type: application/json" \
   -d '{"server": {"url": "http://new-url:9292/v1"}}'
 ```
+
+### GET /state
+
+Retrieve a list of all files in the state directory.
+
+```shell
+curl http://127.0.0.1:5000/state
+```
+
+Response:
+```json
+{
+  "files": ["context.json", "memory.txt", "context.1.json", ...]
+}
+```
+
+### GET /state/<filename>
+
+Retrieve the contents of a file from the state directory.
+
+```shell
+curl http://127.0.0.1:5000/state/context.1.json
+```
+
+Response:
+```json
+{
+  "filename": "context.1.json",
+  "content": "..."
+}
+```
