@@ -41,6 +41,7 @@ def load_context():
     context_path = Path(f"./state/{context_file_path}")
     if not context_path.is_file():
         context_path.parent.mkdir(parents=True, exist_ok=True)
+        context_path.write_text(json.dumps({"version": 1, "history": []}, ensure_ascii=False, indent=2))
         return {"version": 1, "history": []}
     with open(context_path, "r+", encoding="utf-8") as f:
         context = json.load(f)
