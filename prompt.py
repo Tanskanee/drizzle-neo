@@ -293,16 +293,6 @@ def prompt_llm(prompt,debug):
             payload.append(tool_response_entry)
             tool_context_entries.append(tool_response_entry)
             
-            # Save to context file immediately so LLM can see it in next iteration
-            context_path = Path(f"./state/{context_file_path}")
-            with context_path.open("r+", encoding="utf-8") as f:
-                context = json.load(f)
-                context["history"].append(tool_call_entry)
-                context["history"].append(tool_response_entry)
-                f.seek(0)
-                json.dump(context, f, ensure_ascii=False, indent=2)
-                f.truncate()
-
         # Get the next response - the LLM may call another tool or provide a final answer
         final_response = client.chat.completions.create(
             model=model,
