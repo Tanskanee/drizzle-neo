@@ -91,7 +91,8 @@ This image comes with a built-in llama.cpp server that launches a model located
 in `./models/model.gguf` with default parameters. It runs purely on the CPU and
 lacks GPU acceleration.
 
-- Build the base `drizzle-neo` container using the instructions above.
+- Build the base `drizzle-neo` container
+  - `$ podman build -f Containerfile -t drizzle-neo .`
 - Build the "full" container
   - `$ podman build -f Containerfile.full -t drizzle-neo-full .`
 - Download your desired model and save it as `./models/model.gguf`
