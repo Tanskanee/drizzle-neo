@@ -96,10 +96,13 @@ lacks GPU acceleration.
   - `$ podman build -f Containerfile.full -t drizzle-neo-full .`
 - Download your desired model and save it as `./models/model.gguf`
   - If you don't know what model to pick, download
-    `granite-4.0-h-tiny-UD-Q4_K_XL.gguf` from
-    [https://huggingface.co/unsloth/granite-4.0-h-tiny-GGUF/tree/main]
+    `Qwen3.5-2B-GGUF` from
+    [https://huggingface.co/unsloth/Qwen3.5-2B-GGUF/tree/main]
   - Make sure to rename the file to `model.gguf`!
 - Set server.url in `config.json` to `http://127.0.0.1:5050/v1`
+- model.model (and other fields that set the model) don't have to be set, since
+  the built-in llama.cpp server automatically uses the only model it is loaded
+  with
 - Uncomment the drizzle-neo-full example from `compose.yml` and comment out the
   drizzle-neo example
 - Run the example compose.yml
@@ -165,7 +168,7 @@ The MCP server's URL
 
 #### model
 
-The conversation model. Tested with GPT-OSS, Qwen3 and Granite 4.0. The model
+The conversation model. Tested with GPT-OSS, Qwen3, Qwen3.5 and Granite 4.0. The model
 must support tool calls
 
 #### prompt1
