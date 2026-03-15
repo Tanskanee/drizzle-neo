@@ -238,6 +238,24 @@ def get_state_file(filename):
         return jsonify({"error": f"Failed to read file: {str(e)}"}), 500
 
 
+@app.route("/state/<filename>", methods=["PUT"])
+def update_state_file(filename):
+    app.logger.info(f"PUT /state/{filename}")
+    data = request.get_json(force=True) or {}
+    content = data.get("content", "")
+    state_dir = os.path.join(os.path.dirname(__file__), "state")
+    file_path = os.path.join(state_dir, filename)
+
+    try:
+        with open(file_path, "w") as f:
+            f.write(content)
+        app.logger.info(f"PUT /state/{filename}: Success - {len(content)} bytes")
+        return jsonify({"message": f"File '{filename}' updated successfully"})
+    except Exception as e:
+        app.logger.error(f"PUT /state/{filename}: Failed - {str(e)}")
+        return jsonify({"error": f"Failed to update file: {str(e)}"}), 500
+
+
 @app.route("/memory", methods=["PUT"])
 def update_memory():
     data = request.get_json(force=True) or {}

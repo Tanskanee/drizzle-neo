@@ -308,3 +308,74 @@ Response:
   "message": "Memory updated successfully"
 }
 ```
+
+### PUT /state/<filename>
+
+Update the contents of a file in the state directory.
+
+```shell
+curl -X PUT http://127.0.0.1:5000/state/context.1.json \
+  -H "Content-Type: application/json" \
+  -d '{"content": "New file content here"}'
+```
+
+Response:
+```json
+{
+  "message": "File 'context.1.json' updated successfully"
+}
+```
+
+#### Editing Context Files
+
+To implement a frontend for editing conversation context files, use the following workflow:
+
+1. Read a context file: Use `GET /state/<filename>` to retrieve the file content
+2. Present to user: Display the content in an editable format (e.g., JSON editor, chat interface)
+3. Save changes: Use `PUT /state/<filename>` to update the file with edited content
+
+##### Example Workflow (JavaScript)
+
+```javascript
+// 1. Read a specific context file
+const contextResponse = await fetch('http://127.0.0.1:5000/state/context.json');
+const context = await contextResponse.json();
+// context.content contains the file content as a string
+
+// 2. User edits the content in your frontend (e.g., modify history array)
+
+// 3. Save the edited content
+const updateResponse = await fetch('http://127.0.0.1:5000/state/context.json', {
+  method: 'PUT',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ content: editedContent })
+});
+const result = await updateResponse.json();
+// result.message confirms the update
+```
+
+##### Context File Structure
+
+Context files are JSON with the following structure:
+
+```json
+{
+  "version": 1,
+  "history": [
+    {
+      "role": "user",
+      "content": "What time is it?"
+    },
+    {
+      "role": "assistant",
+      "content": "It is Sunday, March 15th, 2026 at 14:24."
+    }
+  ]
+}
+```
+
+When editing, ensure you:
+- Maintain valid JSON structure
+- Preserve the `version` field
+- Keep the `history` array intact
+- Each message should have a `role` ("user", "assistant", or "tool") and `content`
