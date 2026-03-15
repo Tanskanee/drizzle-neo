@@ -59,4 +59,4 @@ def recall_longterm_memory(query: str,
     return retrieved
 
 if __name__ == "__main__":
-    mcp.run(transport="http", host="127.0.0.1", port=8001, path="/mcp", stateless_http=True)
+    mcp.run(transport="http", host="127.0.0.1", port=8000, path="/mcp", stateless_http=True)
