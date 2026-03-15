@@ -188,10 +188,22 @@ def copy_state_file():
 
     match = re.search(r"(\d+)$", base_name)
     if match:
-        next_num = int(match.group(1)) + 1
-        new_filename = f"{base_name.rsplit('.', 1)[0]}.{next_num}{extension}"
+        base_without_num = base_name.rsplit('.', 1)[0]
     else:
-        new_filename = f"{base_name}.1{extension}"
+        base_without_num = base_name
+
+    existing_nums = []
+    for f in os.listdir(state_dir):
+        f_match = re.search(rf"^{re.escape(base_without_num)}\.(\d+){re.escape(extension)}$", f)
+        if f_match:
+            existing_nums.append(int(f_match.group(1)))
+
+    if existing_nums:
+        next_num = max(existing_nums) + 1
+    else:
+        next_num = 1
+
+    new_filename = f"{base_without_num}.{next_num}{extension}"
     dest_path = os.path.join(state_dir, new_filename)
 
     try:
