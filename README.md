@@ -347,6 +347,47 @@ Response:
 }
 ```
 
+### GET /context
+
+Retrieve the conversation history stored in `state/context.json`.
+
+```shell
+curl http://127.0.0.1:5000/context
+```
+
+Response:
+```json
+{
+  "version": 1,
+  "history": [
+    {
+      "role": "user",
+      "content": "What time is it?"
+    },
+    {
+      "role": "assistant",
+      "content": "It is Sunday, March 15th, 2026 at 14:24."
+    }
+  ]
+}
+```
+
+### DELETE /context
+
+Clear all conversation history by resetting `state/context.json` to an empty state.
+
+```shell
+curl -X DELETE http://127.0.0.1:5000/context
+```
+
+Response:
+```json
+{
+  "ok": true,
+  "history": []
+}
+```
+
 #### Editing Context Files
 
 To implement a frontend for editing conversation context files, use the following workflow:
