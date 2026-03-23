@@ -164,6 +164,19 @@ def handle_delete_conversation(conversation_name):
         return jsonify({"error": f"Failed to delete conversation: {str(e)}"}), 500
 
 
+@app.route("/config/default", methods=["GET"])
+def get_default_config():
+    app.logger.info("GET /config/default")
+    config_path = os.path.join(os.path.dirname(__file__), "config.default.json")
+    try:
+        with open(config_path, "r") as f:
+            config = json.load(f)
+        return jsonify(config)
+    except Exception as e:
+        app.logger.error(f"GET /config/default: Failed - {str(e)}")
+        return jsonify({"error": f"Failed to read config: {str(e)}"}), 500
+
+
 @app.route("/config", methods=["GET"])
 def get_config():
     app.logger.info("GET /config")
@@ -354,6 +367,19 @@ def get_models():
     app.logger.info("GET /models")
     models = _fetch_openai_models()
     return jsonify({"models": models})
+
+
+@app.route("/logs", methods=["GET"])
+def get_logs():
+    app.logger.info("GET /logs")
+    try:
+        with open(log_file, "r") as f:
+            content = f.read()
+        app.logger.info(f"GET /logs: Success - {len(content)} bytes")
+        return content
+    except Exception as e:
+        app.logger.error(f"GET /logs: Failed - {str(e)}")
+        return jsonify({"error": f"Failed to read logs: {str(e)}"}), 500
 
 
 if __name__ == "__main__":
